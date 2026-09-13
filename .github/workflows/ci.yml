@@ -1,0 +1,48 @@
+name: Backend checks
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-bookworm
+        env:
+          POSTGRES_USER: kazi
+          POSTGRES_PASSWORD: kazi_ci_only
+          POSTGRES_DB: kazi_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U kazi -d kazi_test"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgres://kazi:kazi_ci_only@localhost:5432/kazi_test?sslmode=disable
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - run: go mod download
+      - name: Check formatting
+        run: test -z "$(gofmt -l .)"
+      - run: go vet ./...
+      - run: go test -race -cover ./...
+      - run: go build ./cmd/api
+      - name: Build container
+        run: docker build -t kazi-backend:ci .
+      - name: Smoke-test container against PostgreSQL
+        run: |
+          docker run -d --name kazi-api --network host -e DATABASE_URL="$TEST_DATABASE_URL" -e APP_ENV=test kazi-backend:ci
+          curl --fail --retry 10 --retry-connrefused --retry-delay 2 http://localhost:8080/readyz
+          curl --fail http://localhost:8080/healthz
+      - name: Container logs
+        if: always()
+        run: docker logs kazi-api || true
+      - name: Stop container
+        if: always()
+        run: docker rm -f kazi-api || true
