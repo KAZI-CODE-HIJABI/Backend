@@ -43,7 +43,7 @@ func run() error {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 	connectCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	_, pool, err := database.Open(connectCtx, cfg.DatabaseURL)
+	pool, err := database.Open(connectCtx, cfg.DatabaseURL)
 	cancel()
 	if err != nil {
 		return errors.New("database connection failed; check DATABASE_URL and database availability")

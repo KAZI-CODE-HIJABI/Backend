@@ -10,10 +10,11 @@ import (
 )
 
 type Config struct {
-	Environment string
-	HTTPAddress string
-	DatabaseURL string
-	LogLevel    string
+	Environment          string
+	HTTPAddress          string
+	DatabaseURL          string
+	MigrationDatabaseURL string
+	LogLevel             string
 }
 
 // Load reads an optional .env file; process environment values take precedence.
@@ -32,7 +33,7 @@ func Load() (Config, error) {
 			return Config{}, fmt.Errorf("read configuration: %w", err)
 		}
 	}
-	c := Config{Environment: v.GetString("APP_ENV"), HTTPAddress: v.GetString("HTTP_ADDR"), DatabaseURL: v.GetString("DATABASE_URL"), LogLevel: v.GetString("LOG_LEVEL")}
+	c := Config{Environment: v.GetString("APP_ENV"), HTTPAddress: v.GetString("HTTP_ADDR"), DatabaseURL: v.GetString("DATABASE_URL"), MigrationDatabaseURL: v.GetString("DATABASE_MIGRATION_URL"), LogLevel: v.GetString("LOG_LEVEL")}
 	return c, c.Validate()
 }
 

@@ -11,7 +11,7 @@ import (
 	"go.uber.org/zap"
 )
 
-type DatabasePinger interface{ PingContext(context.Context) error }
+type DatabasePinger interface{ Ping(context.Context) error }
 
 func Router(db DatabasePinger, log *zap.Logger) *gin.Engine {
 	r := gin.New()
@@ -32,7 +32,7 @@ func Router(db DatabasePinger, log *zap.Logger) *gin.Engine {
 	r.GET("/readyz", func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(c.Request.Context(), 2*time.Second)
 		defer cancel()
-		if err := db.PingContext(ctx); err != nil {
+		if err := db.Ping(ctx); err != nil {
 			response.Error(c, 503, "NOT_READY", "Database is unavailable.")
 			return
 		}

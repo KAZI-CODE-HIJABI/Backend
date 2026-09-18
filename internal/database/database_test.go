@@ -15,13 +15,13 @@ func TestOpenIntegration(t *testing.T) {
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	db, pool, err := Open(ctx, dsn)
+	pool, err := Open(ctx, dsn)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer pool.Close()
 	var value int
-	if err := db.WithContext(ctx).Raw("SELECT 1").Scan(&value).Error; err != nil {
+	if err := pool.QueryRow(ctx, "SELECT 1").Scan(&value); err != nil {
 		t.Fatal(err)
 	}
 	if value != 1 {

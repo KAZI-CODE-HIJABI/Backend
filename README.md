@@ -5,7 +5,7 @@ Go backend for **KAZI — Prove what you can do.**
 ## Current milestone: runnable foundation
 
 Implemented: Gin API startup, validated environment configuration, Zap logging,
-GORM/PostgreSQL connection pooling, graceful shutdown, liveness/readiness checks,
+pgxpool/PostgreSQL connection pooling, graceful shutdown, liveness/readiness checks,
 Docker Compose, unit tests and CI with PostgreSQL integration testing.
 
 Business endpoints, authentication, schema migrations, jobs, candidate-code execution
@@ -59,6 +59,18 @@ go test ./...
 go build -o bin/api ./cmd/api
 ```
 
+## Database migrations
+
+Use the direct database URL in `DATABASE_MIGRATION_URL`. Then run:
+
+```sh
+go run ./cmd/migrate up
+```
+
+or `make migrate-up`. Migrations `000004` and `000005` belong to the assessment
+branch and require the authentication/profile and challenge migrations planned as
+`000001` and `000002`. Do not apply them until those prerequisite migrations exist.
+
 Database integration tests skip unless `TEST_DATABASE_URL` is set. To include them
 in PowerShell after starting the database:
 
@@ -92,8 +104,8 @@ opportunities, matching, discovery, invites and scoped identity reveal.
 Developer 2 owns submissions, isolated runner, tests, fixed follow-up, AI,
 assessment, evidence, integrity and Skills Passport.
 
-Use Gin's validator-backed binding for request validation. Gin, GORM's PostgreSQL
-driver, Viper and Zap are wired now. JWT, UUIDv7 and hot-reload tooling should be
+Use Gin's validator-backed binding for request validation. Gin, pgxpool, Viper and
+Zap are wired now. JWT, UUIDv7 and hot-reload tooling should be
 chosen and pinned when their modules are introduced; unused packages are not added
 just to fill out a stack list.
 
