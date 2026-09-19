@@ -16,9 +16,9 @@ const (
 )
 
 type CreateInput struct {
-	ChallengeID string
-	Code        string
-	Explanation string
+	ChallengeID string `json:"challenge_id"`
+	Code        string `json:"code"`
+	Explanation string `json:"explanation"`
 }
 
 type TestResults struct {
