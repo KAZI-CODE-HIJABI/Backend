@@ -35,3 +35,13 @@ projection for matching and employer views, then implements invites and reveal.
 The worker must not execute arbitrary code locally as a temporary shortcut. A stub
 may return clearly labelled test fixtures in tests only; it must not produce a
 real-looking assessment for an actual candidate.
+
+## Assessment branch status
+
+Completed: pgxpool connection layer, direct-URL migration runner, migrations 000004
+and 000005, submission state rules, trusted test-result validation, isolated runner
+interface, AI-observation validation, fixed assessment rules and passport projection.
+
+Still needed: a real isolated Node.js execution implementation, persistence repositories
+and HTTP handlers after authentication middleware and challenge migrations are merged,
+an LLM provider credential and adapter, and the end-to-end candidate/employer flow.

@@ -21,6 +21,23 @@ type CreateInput struct {
 	Explanation string
 }
 
+type TestResults struct {
+	Passed          int
+	Failed          int
+	Total           int
+	ExecutionTimeMS int
+}
+
+func (r TestResults) Validate() error {
+	if r.Passed < 0 || r.Failed < 0 || r.Total < 0 || r.ExecutionTimeMS < 0 {
+		return errors.New("test results cannot contain negative values")
+	}
+	if r.Passed+r.Failed != r.Total {
+		return errors.New("test result total must equal passed plus failed")
+	}
+	return nil
+}
+
 func (in CreateInput) Validate() error {
 	if strings.TrimSpace(in.ChallengeID) == "" {
 		return errors.New("challenge_id is required")
@@ -55,3 +72,6 @@ func CanAnswerFollowup(status Status, existingAnswer bool) error {
 	}
 	return nil
 }
+
+func CanClaimJob(status Status) bool  { return status == Queued }
+func CanFinishJob(status Status) bool { return status == Running }

@@ -36,3 +36,12 @@ func TestFollowupRules(t *testing.T) {
 		t.Fatal("repeat answer must be rejected")
 	}
 }
+
+func TestTestResultsMustBeInternallyConsistent(t *testing.T) {
+	if err := (TestResults{Passed: 8, Failed: 2, Total: 10, ExecutionTimeMS: 1820}).Validate(); err != nil {
+		t.Fatal(err)
+	}
+	if err := (TestResults{Passed: 8, Failed: 2, Total: 9}).Validate(); err == nil {
+		t.Fatal("mismatched result total must be rejected")
+	}
+}

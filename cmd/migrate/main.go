@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -10,6 +11,7 @@ import (
 	"strconv"
 
 	"github.com/KAZI-CODE-HIJABI/Backend/internal/config"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -98,7 +100,10 @@ func up(ctx context.Context, pool *pgxpool.Pool) error {
 func down(ctx context.Context, pool *pgxpool.Pool) error {
 	var version int64
 	if err := pool.QueryRow(ctx, `SELECT version FROM schema_migrations ORDER BY version DESC LIMIT 1`).Scan(&version); err != nil {
-		return nil
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil
+		}
+		return err
 	}
 	migrations, err := find("down")
 	if err != nil {
